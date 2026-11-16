@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contagem Regressiva | Lourena 🌿</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #d8ece3;
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --primary: #4c7c63;
+      --primary-dark: #284b39;
+      --text-main: #1f362a;
+      --text-muted: #4b6859;
+      --badge-bg: #dcece3;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .bg-landscape {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 35vh;
+      opacity: 0.25;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 28px;
+      max-width: 460px;
+      width: 100%;
+      padding: 32px 26px 28px;
+      box-shadow: 0 20px 45px rgba(31, 54, 42, 0.1);
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      animation: fadeUp 0.5s ease-out;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--badge-bg);
+      color: var(--primary-dark);
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+      letter-spacing: 0.3px;
+    }
+
+    .illustration-box {
+      width: 100%;
+      height: 200px;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 22px;
+      background: #e1efe8;
+      position: relative;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.04);
+    }
+
+    .illustration-box svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+
+    p.message {
+      font-size: 0.97rem;
+      line-height: 1.65;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .verse-box {
+      display: none;
+      background: #f0f8f4;
+      border-left: 4px solid var(--primary);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      text-align: left;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: var(--primary-dark);
+    }
+
+    .verse-ref {
+      display: block;
+      margin-top: 6px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--primary);
+    }
+
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .time-box {
+      background: #f4f9f6;
+      border: 1px solid rgba(76, 124, 99, 0.15);
+      border-radius: 16px;
+      padding: 12px 6px;
+    }
+
+    .time-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      display: block;
+    }
+
+    .time-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .bday-banner {
+      display: none;
+      background: linear-gradient(135deg, #2d5a44, #4c8568);
+      color: #ffffff;
+      padding: 14px;
+      border-radius: 16px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      letter-spacing: 0.3px;
+    }
+
+    .unlock-hint {
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+
+  <svg class="bg-landscape" viewBox="0 0 1200 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,300 L0,200 Q150,120 300,200 Q450,80 600,180 Q800,100 1000,220 L1200,190 L1200,300 Z" fill="#3c6e54"/>
+  </svg>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <main class="card">
+    <div class="badge" id="day-badge">🌿 Carregando...</div>
+
+    <div class="illustration-box" id="illustration-container"></div>
+
+    <h1 id="main-title">Operação Aniversário</h1>
+    <p class="message" id="main-message">Preparando tudo...</p>
+
+    <div class="verse-box" id="verse-box">
+      “Que o Senhor te abençoe e te guarde; que o Senhor faça resplandecer o seu rosto sobre ti, tenha compaixão de ti e te conceda a paz.”
+      <span class="verse-ref">— Números 6:24-26</span>
+    </div>
+
+    <div class="countdown-grid" id="countdown-box">
+      <div class="time-box">
+        <span class="time-value" id="days">00</span>
+        <span class="time-label">Dias</span>
+      </div>
+      <div class="time-box">
+        <span class="time-value" id="hours">00</span>
+        <span class="time-label">Horas</span>
+      </div>
+      <div class="time-box">
+        <span class="time-value" id="minutes">00</span>
+        <span class="time-label">Min</span>
+      </div>
+      <div class="time-box">
+        <span class="time-value" id="seconds">00</span>
+        <span class="time-label">Seg</span>
+      </div>
+    </div>
+
+    <div class="bday-banner" id="bday-banner">
+      🎉 Feliz Aniversário, Lourena! Aproveite muito o seu dia! 🎂✨
+    </div>
+
+    <p class="unlock-hint" id="unlock-hint">🔒 Nova surpresa liberada automaticamente à meia-noite</p>
+  </main>
+
+  <script>
+    const dayConfigs = {
+      16: {
+        badge: "🌿 Faltam 3 dias • Segunda-feira",
+        title: "Olha só, chuchu... começou! 💚",
+        message: "Faltam poucos dias para chegar o seu dia especial! Fiz esse cantinho todo no seu verde favorito só para te lembrar o quanto você é querida.",
+        svg: `
+          <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="200" fill="#dff0e7"/>
+            <circle cx="320" cy="48" r="24" fill="#b7dec9"/>
+            <path d="M-10,165 Q55,75 125,165 Z" fill="#7da890"/>
+            <path d="M195,165 Q275,20 355,165 Z" fill="#548269"/>
+            <line x1="65" y1="115" x2="275" y2="75" stroke="#355946" stroke-width="2" stroke-dasharray="4 2"/>
+            <rect x="154" y="105" width="32" height="18" rx="5" fill="#284b39"/>
+            <rect x="158" y="109" width="7" height="7" rx="1.5" fill="#dff0e7"/>
+            <rect x="167" y="109" width="7" height="7" rx="1.5" fill="#dff0e7"/>
+            <rect x="176" y="109" width="7" height="7" rx="1.5" fill="#dff0e7"/>
+            <rect x="0" y="155" width="400" height="45" fill="#63967b"/>
+          </svg>
+        `
+      },
+      17: {
+        badge: "🌊 Faltam 2 dias • Terça-feira",
+        title: "Oi, meu doce! Falta bem pouco... ✨",
+        message: "Passando por aqui para deixar seu dia mais leve e avisar que o relógio está correndo! Cada dia perto do seu aniversário já é motivo para sorrir.",
+        svg: `
+          <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="200" fill="#d5ebe0"/>
+            <circle cx="95" cy="55" r="28" fill="#a8d3bc"/>
+            <rect x="0" y="105" width="400" height="40" fill="#689c81"/>
+            <rect x="0" y="138" width="400" height="24" fill="#e6eee5"/>
+            <rect x="0" y="160" width="400" height="40" fill="#f2f7f4"/>
+            <path d="M-20,175 Q15,163 50,175 T120,175 T190,175 T260,175 T330,175 T400,175 T470,175" fill="none" stroke="#2c5440" stroke-width="8"/>
+            <path d="M-20,192 Q15,180 50,192 T120,192 T190,192 T260,192 T330,192 T400,192 T470,192" fill="none" stroke="#487a60" stroke-width="7"/>
+            <path d="M315,160 Q300,105 322,58" fill="none" stroke="#39614c" stroke-width="7" stroke-linecap="round"/>
+            <path d="M322,58 Q285,48 272,72" fill="none" stroke="#284b39" stroke-width="5" stroke-linecap="round"/>
+            <path d="M322,58 Q358,45 370,70" fill="none" stroke="#284b39" stroke-width="5" stroke-linecap="round"/>
+          </svg>
+        `
+      },
+      18: {
+        badge: "🌅 Falta 1 dia • Véspera!",
+        title: "É amanhã, meu bem! Segura o coração 💚",
+        message: "Últimas horas antes do seu grande dia chegar! Que você tenha uma noite tranquila e cheia de paz esperando pela virada.",
+        svg: `
+          <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="200" fill="#c3e3d5"/>
+            <circle cx="140" cy="128" r="38" fill="#8ec2a8"/>
+            <path d="M15,135 L42,88 L62,118 L78,96 L105,135 Z" fill="#7aa891"/>
+            <rect x="0" y="135" width="400" height="65" fill="#467860"/>
+            <path d="M195,200 Q235,115 310,108 Q365,104 410,145 L410,200 Z" fill="#234736"/>
+          </svg>
+        `
+      },
+      19: {
+        badge: "🎉 19 de Novembro • Feliz Aniversário!",
+        title: "Parabéns, Lourena! Meu chuchu 💚🎂",
+        message: "Chegou o seu dia! Que Deus te abençoe grandemente, te proteja de todo mal e te dê muitos anos de vida com saúde, alegria e paz. Você é muito importante na minha vida e merece tudo de mais lindo nesse mundo!",
+        svg: `
+          <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="200" fill="#cbe6d8"/>
+            <path d="M70,200 Q200,115 330,200 Z" fill="#5d9478"/>
+            <rect x="184" y="132" width="32" height="18" rx="3" fill="#28523d"/>
+            <path d="M191,132 L194,86 L206,86 L209,132 Z" fill="#1b3d2c"/>
+            <rect x="158" y="88" width="84" height="9" rx="4.5" fill="#1b3d2c"/>
+            <circle cx="200" cy="77" r="7" fill="#1b3d2c"/>
+          </svg>
+        `
+      }
+    };
+
+    const targetDate = new Date("2026-11-19T00:00:00").getTime();
+
+    function initPage() {
+      const nowObj = new Date();
+      const now = nowObj.getTime();
+      const day = nowObj.getDate();
+      const month = nowObj.getMonth() + 1;
+
+      let activeDay = 16;
+      if (month === 11 && day >= 19) activeDay = 19;
+      else if (month === 11 && day >= 16 && day <= 18) activeDay = day;
+      else if (month > 11) activeDay = 19;
+
+      const config = dayConfigs[activeDay];
+
+      document.getElementById("day-badge").innerText = config.badge;
+      document.getElementById("main-title").innerText = config.title;
+      document.getElementById("main-message").innerText = config.message;
+      document.getElementById("illustration-container").innerHTML = config.svg;
+
+      if (activeDay === 19) {
+        document.getElementById("countdown-box").style.display = "none";
+        document.getElementById("bday-banner").style.display = "block";
+        document.getElementById("verse-box").style.display = "block";
+        document.getElementById("unlock-hint").style.display = "none";
+        startConfetti();
+      } else {
+        document.getElementById("countdown-box").style.display = "grid";
+        document.getElementById("bday-banner").style.display = "none";
+        document.getElementById("verse-box").style.display = "none";
+        document.getElementById("unlock-hint").style.display = "block";
+        stopConfetti();
+      }
+    }
+
+    function updateCountdownTimer() {
+      const now = new Date().getTime();
+      const distance = targetDate - now;
+
+      if (distance > 0) {
+        document.getElementById("days").innerText = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, "0");
+        document.getElementById("hours").innerText = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+        document.getElementById("minutes").innerText = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+        document.getElementById("seconds").innerText = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, "0");
+      }
+    }
+
+    let confettiAnimId;
+    const canvas = document.getElementById("confetti-canvas");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+
+    function startConfetti() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const colors = ["#285e45", "#548269", "#8ec2a8", "#d4af37", "#ffffff"];
+      particles = Array.from({ length: 75 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 3 + 1.5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        tilt: Math.random() * 10 - 5
+      }));
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.ellipse(p.x, p.y, p.r, p.r * 0.6, p.tilt, 0, Math.PI * 2);
+          ctx.fill();
+          p.y += p.d;
+          p.x += Math.sin(p.y * 0.02) * 1.2;
+          if (p.y > canvas.height) {
+            p.y = -10;
+            p.x = Math.random() * canvas.width;
+          }
+        });
+        confettiAnimId = requestAnimationFrame(draw);
+      }
+      cancelAnimationFrame(confettiAnimId);
+      draw();
+    }
+
+    function stopConfetti() {
+      cancelAnimationFrame(confettiAnimId);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    initPage();
+    updateCountdownTimer();
+    setInterval(updateCountdownTimer, 1000);
+  </script>
+</body>
+</html>
